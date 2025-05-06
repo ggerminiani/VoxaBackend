@@ -1,5 +1,7 @@
 from flask import Blueprint, request, jsonify
 
+from models import Usuario
+
 user_bp = Blueprint('user', __name__)
 
 
@@ -26,3 +28,24 @@ def criar_usuario():
 
     # Aqui depois a gente conecta no banco e salva
     return jsonify({"mensagem": f"Usuário {nome} criado com sucesso!"})
+
+@user_bp.route('/list', methods=['GET'])
+def listar_usuario():
+    try:
+        usuarios = Usuario.query.all()
+        resultado = []
+        for u in usuarios:
+            resultado.append({
+                "id": u.id,
+                "nome": u.nome,
+                "email": u.email,
+                "telefone": u.telefone,
+                "foto_perfil": u.foto_perfil,
+                "tipo_usuario": u.tipo_usuario,
+                "ativo": u.ativo,
+                "criado_em": u.criado_em.isoformat(),
+                "atualizado_em": u.atualizado_em.isoformat()
+            })
+        return jsonify(resultado)
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
